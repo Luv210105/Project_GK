@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { apiRequest, buildImageUrl } from "../api";
+import { apiRequest, buildDownloadFilename, buildImageUrl, downloadImage } from "../api";
 import { useAuth } from "../auth.jsx";
 
 export default function PhotoDetailPage() {
@@ -11,6 +11,7 @@ export default function PhotoDetailPage() {
   const [formData, setFormData] = useState({ title: "", description: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
@@ -53,7 +54,7 @@ export default function PhotoDetailPage() {
         token
       );
       setPhoto(updated);
-      setMessage("Cập nhật ảnh thành công.");
+      setMessage("Cap nhat anh thanh cong.");
     } catch (saveError) {
       setError(saveError.message);
     } finally {
@@ -62,7 +63,7 @@ export default function PhotoDetailPage() {
   };
 
   const handleDelete = async () => {
-    const confirmed = window.confirm("Bạn có chắc muốn xóa ảnh này?");
+    const confirmed = window.confirm("Ban co chac muon xoa anh nay?");
     if (!confirmed) {
       return;
     }
@@ -75,14 +76,31 @@ export default function PhotoDetailPage() {
     }
   };
 
+  const handleDownload = async () => {
+    if (!photo) {
+      return;
+    }
+
+    setError("");
+    setDownloading(true);
+
+    try {
+      await downloadImage(photo.image_url, buildDownloadFilename(photo.title, photo.image_url));
+    } catch (downloadError) {
+      setError(downloadError.message);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   if (loading) {
-    return <div className="panel empty-state">Đang tải chi tiết ảnh...</div>;
+    return <div className="panel empty-state">Dang tai chi tiet anh...</div>;
   }
 
   if (!photo) {
     return (
       <div className="panel empty-state">
-        Không thể tải ảnh. <Link to="/gallery">Quay lại gallery</Link>
+        Khong the tai anh. <Link to="/gallery">Quay lai gallery</Link>
       </div>
     );
   }
@@ -100,11 +118,11 @@ export default function PhotoDetailPage() {
 
         <form className="detail-form" onSubmit={handleSave}>
           <label>
-            Tiêu đề
+            Tieu de
             <input name="title" type="text" value={formData.title} onChange={handleChange} required />
           </label>
           <label>
-            Mô tả
+            Mo ta
             <textarea
               name="description"
               rows="5"
@@ -116,13 +134,16 @@ export default function PhotoDetailPage() {
           {error ? <div className="alert error">{error}</div> : null}
           <div className="card-actions">
             <button type="submit" className="primary-button" disabled={saving}>
-              {saving ? "Đang lưu..." : "Lưu thay đổi"}
+              {saving ? "Dang luu..." : "Luu thay doi"}
+            </button>
+            <button type="button" className="ghost-button" onClick={handleDownload} disabled={downloading}>
+              {downloading ? "Dang tai..." : "Download"}
             </button>
             <button type="button" className="danger-button" onClick={handleDelete}>
-              Xóa ảnh
+              Xoa anh
             </button>
             <Link className="secondary-button" to="/gallery">
-              Quay lại
+              Quay lai
             </Link>
           </div>
         </form>

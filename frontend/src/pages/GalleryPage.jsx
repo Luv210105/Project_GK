@@ -1,6 +1,6 @@
 import { useDeferredValue, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { apiRequest, buildImageUrl } from "../api";
+import { apiRequest, buildDownloadFilename, buildImageUrl, downloadImage } from "../api";
 import { useAuth } from "../auth.jsx";
 
 const emptyForm = { title: "", description: "", image: null };
@@ -9,9 +9,11 @@ export default function GalleryPage() {
   const { token, logout } = useAuth();
   const [photos, setPhotos] = useState([]);
   const [search, setSearch] = useState("");
+  const [sortMode, setSortMode] = useState("uploaded");
   const [uploadForm, setUploadForm] = useState(emptyForm);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [downloadingPhotoId, setDownloadingPhotoId] = useState(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const deferredSearch = useDeferredValue(search);
@@ -25,7 +27,7 @@ export default function GalleryPage() {
       const data = await apiRequest(`/api/photos${query}`, { method: "GET" }, token);
       setPhotos(data);
     } catch (loadError) {
-      if (loadError.message.toLowerCase().includes("đăng nhập")) {
+      if (loadError.message.toLowerCase().includes("dang nhap")) {
         logout();
       }
       setError(loadError.message);
@@ -62,7 +64,7 @@ export default function GalleryPage() {
 
       await apiRequest("/api/photos", { method: "POST", body: formData }, token);
       setUploadForm(emptyForm);
-      setMessage("Upload ảnh thành công.");
+      setMessage("Upload anh thanh cong.");
       await loadPhotos();
       event.target.reset();
     } catch (uploadError) {
@@ -73,7 +75,7 @@ export default function GalleryPage() {
   };
 
   const handleDelete = async (photoId) => {
-    const confirmed = window.confirm("Bạn có chắc muốn xóa ảnh này?");
+    const confirmed = window.confirm("Ban co chac muon xoa anh nay?");
     if (!confirmed) {
       return;
     }
@@ -83,12 +85,34 @@ export default function GalleryPage() {
 
     try {
       await apiRequest(`/api/photos/${photoId}`, { method: "DELETE" }, token);
-      setMessage("Xóa ảnh thành công.");
+      setMessage("Xoa anh thanh cong.");
       await loadPhotos();
     } catch (deleteError) {
       setError(deleteError.message);
     }
   };
+
+  const handleDownload = async (photo) => {
+    setError("");
+    setMessage("");
+    setDownloadingPhotoId(photo.id);
+
+    try {
+      await downloadImage(photo.image_url, buildDownloadFilename(photo.title, photo.image_url));
+    } catch (downloadError) {
+      setError(downloadError.message);
+    } finally {
+      setDownloadingPhotoId(null);
+    }
+  };
+
+  const visiblePhotos = [...photos].sort((firstPhoto, secondPhoto) => {
+    if (sortMode === "alphabetical") {
+      return firstPhoto.title.localeCompare(secondPhoto.title, undefined, { sensitivity: "base" });
+    }
+
+    return new Date(secondPhoto.uploaded_at).getTime() - new Date(firstPhoto.uploaded_at).getTime();
+  });
 
   return (
     <section className="gallery-layout">
@@ -96,21 +120,30 @@ export default function GalleryPage() {
         <div className="section-heading">
           <div>
             <p className="eyebrow">Upload</p>
-            <h1>Bộ sưu tập của bạn</h1>
+            <h1>Bo suu tap cua ban</h1>
           </div>
-          <div className="search-box">
-            <input
-              type="search"
-              placeholder="Tìm theo tên ảnh..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
+          <div className="gallery-toolbar">
+            <div className="search-box">
+              <input
+                type="search"
+                placeholder="Tim theo ten anh..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </div>
+            <label className="sort-box">
+              <span>Sap xep</span>
+              <select value={sortMode} onChange={(event) => setSortMode(event.target.value)}>
+                <option value="uploaded">Theo thu tu upload</option>
+                <option value="alphabetical">Ten A-Z</option>
+              </select>
+            </label>
           </div>
         </div>
 
         <form className="upload-form" onSubmit={handleUpload}>
           <label>
-            Tiêu đề ảnh
+            Tieu de anh
             <input
               type="text"
               name="title"
@@ -120,7 +153,7 @@ export default function GalleryPage() {
             />
           </label>
           <label>
-            Mô tả
+            Mo ta
             <textarea
               name="description"
               rows="3"
@@ -129,11 +162,11 @@ export default function GalleryPage() {
             />
           </label>
           <label>
-            File ảnh
+            File anh
             <input type="file" accept="image/*" onChange={handleFileChange} required />
           </label>
           <button type="submit" className="primary-button" disabled={uploading}>
-            {uploading ? "Đang upload..." : "Upload ảnh"}
+            {uploading ? "Dang upload..." : "Upload anh"}
           </button>
         </form>
 
@@ -143,23 +176,32 @@ export default function GalleryPage() {
 
       <div className="gallery-section">
         {loading ? (
-          <div className="panel empty-state">Đang tải danh sách ảnh...</div>
-        ) : photos.length === 0 ? (
-          <div className="panel empty-state">Chưa có ảnh nào phù hợp. Hãy upload ảnh đầu tiên của bạn.</div>
+          <div className="panel empty-state">Dang tai danh sach anh...</div>
+        ) : visiblePhotos.length === 0 ? (
+          <div className="panel empty-state">Chua co anh nao phu hop. Hay upload anh dau tien cua ban.</div>
         ) : (
           <div className="photo-grid">
-            {photos.map((photo) => (
+            {visiblePhotos.map((photo) => (
               <article key={photo.id} className="photo-card">
                 <img src={buildImageUrl(photo.image_url)} alt={photo.title} className="photo-thumb" />
                 <div className="photo-card-body">
                   <h3>{photo.title}</h3>
-                  <p>{photo.description || "Chưa có mô tả."}</p>
+                  <p>{photo.description || "Chua co mo ta."}</p>
+                  <p className="meta-text">Upload: {new Date(photo.uploaded_at).toLocaleString()}</p>
                   <div className="card-actions">
                     <Link className="secondary-button" to={`/photos/${photo.id}`}>
-                      Xem chi tiết
+                      Xem chi tiet
                     </Link>
+                    <button
+                      className="ghost-button"
+                      type="button"
+                      onClick={() => handleDownload(photo)}
+                      disabled={downloadingPhotoId === photo.id}
+                    >
+                      {downloadingPhotoId === photo.id ? "Dang tai..." : "Download"}
+                    </button>
                     <button className="danger-button" type="button" onClick={() => handleDelete(photo.id)}>
-                      Xóa
+                      Xoa
                     </button>
                   </div>
                 </div>

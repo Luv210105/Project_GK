@@ -1,7 +1,7 @@
-﻿import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth.jsx";
 
-export default function Navbar() {
+export default function Navbar({ theme, onToggleTheme }) {
   const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
 
@@ -21,9 +21,12 @@ export default function Navbar() {
       </Link>
 
       <nav className="nav-links">
+        <button className="ghost-button theme-toggle" type="button" onClick={onToggleTheme}>
+          {theme === "light" ? "Dark mode" : "Light mode"}
+        </button>
         {isAuthenticated ? (
           <>
-            <span className="welcome-text">Xin chào, {user.username}</span>
+            <span className="welcome-text">Xin chao, {user.username}</span>
             <button className="ghost-button" type="button" onClick={handleLogout}>
               Logout
             </button>
@@ -38,4 +41,3 @@ export default function Navbar() {
     </header>
   );
 }
-

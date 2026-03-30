@@ -1,9 +1,12 @@
-﻿:root {
+:root {
   color-scheme: light;
   font-family: "Segoe UI", Tahoma, Arial, sans-serif;
   --bg: #f6efe5;
   --surface: rgba(255, 250, 244, 0.8);
   --surface-strong: #fff8ef;
+  --surface-header: rgba(255, 249, 240, 0.72);
+  --surface-chip: rgba(255, 255, 255, 0.65);
+  --field-bg: rgba(255, 255, 255, 0.82);
   --ink: #1f2933;
   --muted: #5f6b76;
   --accent: #d95d39;
@@ -14,7 +17,38 @@
   --danger: #aa2e25;
   --success: #1e7a46;
   --line: rgba(31, 41, 51, 0.12);
+  --topbar-line: rgba(31, 41, 51, 0.08);
   --shadow: 0 24px 80px rgba(117, 74, 33, 0.14);
+  --page-bg:
+    radial-gradient(circle at top left, rgba(236, 164, 97, 0.42), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(75, 138, 154, 0.28), transparent 22%),
+    linear-gradient(160deg, #fef8f1 0%, #f5ecdf 48%, #efe3d2 100%);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #10161d;
+  --surface: rgba(18, 26, 35, 0.82);
+  --surface-strong: #16212c;
+  --surface-header: rgba(10, 16, 24, 0.78);
+  --surface-chip: rgba(24, 34, 46, 0.88);
+  --field-bg: rgba(11, 18, 27, 0.92);
+  --ink: #edf2f7;
+  --muted: #a9b7c6;
+  --accent: #ff8f61;
+  --accent-dark: #ffd2bf;
+  --accent-soft: rgba(255, 143, 97, 0.16);
+  --secondary: #72d1df;
+  --secondary-soft: rgba(114, 209, 223, 0.18);
+  --danger: #ff7b72;
+  --success: #58c78c;
+  --line: rgba(196, 214, 229, 0.16);
+  --topbar-line: rgba(196, 214, 229, 0.12);
+  --shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+  --page-bg:
+    radial-gradient(circle at top left, rgba(255, 143, 97, 0.18), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(114, 209, 223, 0.18), transparent 22%),
+    linear-gradient(160deg, #0f1720 0%, #111d28 45%, #162433 100%);
 }
 
 * {
@@ -25,10 +59,8 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--ink);
-  background:
-    radial-gradient(circle at top left, rgba(236, 164, 97, 0.42), transparent 26%),
-    radial-gradient(circle at bottom right, rgba(75, 138, 154, 0.28), transparent 22%),
-    linear-gradient(160deg, #fef8f1 0%, #f5ecdf 48%, #efe3d2 100%);
+  background: var(--page-bg);
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 a {
@@ -38,7 +70,8 @@ a {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 
@@ -80,8 +113,8 @@ textarea {
   gap: 1rem;
   padding: 1rem 1.5rem;
   backdrop-filter: blur(18px);
-  background: rgba(255, 249, 240, 0.72);
-  border-bottom: 1px solid rgba(31, 41, 51, 0.08);
+  background: var(--surface-header);
+  border-bottom: 1px solid var(--topbar-line);
 }
 
 .brand {
@@ -136,8 +169,9 @@ textarea {
 .nav-links a,
 .ghost-button {
   padding: 0.7rem 1rem;
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(31, 41, 51, 0.08);
+  color: var(--ink);
+  background: var(--surface-chip);
+  border: 1px solid var(--line);
 }
 
 .nav-links a.active {
@@ -147,7 +181,7 @@ textarea {
 .welcome-text {
   padding: 0.45rem 0.8rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--surface-chip);
   color: var(--muted);
 }
 
@@ -172,7 +206,7 @@ textarea {
   position: relative;
   overflow: hidden;
   padding: 1.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--line);
   border-radius: 28px;
   background: var(--surface);
   box-shadow: var(--shadow);
@@ -251,16 +285,19 @@ label {
 }
 
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 0.88rem 1rem;
   border: 1px solid var(--line);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  background: var(--field-bg);
 }
 
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   outline: 2px solid rgba(31, 108, 120, 0.16);
   border-color: var(--secondary);
 }
@@ -320,8 +357,25 @@ textarea:focus {
   margin-bottom: 1rem;
 }
 
+.gallery-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: end;
+  gap: 0.75rem;
+}
+
 .search-box {
   width: min(320px, 100%);
+}
+
+.sort-box {
+  min-width: 220px;
+}
+
+.sort-box span {
+  font-size: 0.82rem;
+  color: var(--muted);
 }
 
 .photo-grid {
@@ -334,7 +388,7 @@ textarea:focus {
   overflow: hidden;
   border-radius: 24px;
   background: var(--surface-strong);
-  border: 1px solid rgba(31, 41, 51, 0.08);
+  border: 1px solid var(--line);
   box-shadow: 0 18px 40px rgba(31, 41, 51, 0.08);
 }
 
@@ -400,6 +454,23 @@ textarea:focus {
   color: var(--muted);
 }
 
+body,
+.topbar,
+.panel,
+.photo-card,
+input,
+textarea,
+select,
+.nav-links a,
+.ghost-button,
+.welcome-text {
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
 @media (max-width: 860px) {
   .auth-layout,
   .detail-layout {
@@ -412,9 +483,15 @@ textarea:focus {
     align-items: stretch;
   }
 
+  .gallery-toolbar {
+    justify-content: stretch;
+  }
+
+  .sort-box {
+    min-width: 100%;
+  }
+
   .nav-links {
     flex-wrap: wrap;
   }
 }
-
-

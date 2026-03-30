@@ -1,4 +1,4 @@
-﻿# Gallery App
+# Gallery App
 
 ## Cong nghe
 
@@ -6,19 +6,16 @@
 - Frontend: ReactJS (Vite)
 - Database: SQLite
 
-## Chuc nang da hoan thanh
+## Chuc nang
 
 - Dang ky, dang nhap
-- Hash password truoc khi luu
 - Upload anh va luu metadata vao SQLite
-- Xem danh sach anh cua user hien tai
-- Xem chi tiet anh
-- Sua title va description
-- Xoa anh
-- Tim kiem anh theo title
+- Xem danh sach, chi tiet, sua, xoa anh
+- Tim kiem theo ten anh
+- Sap xep anh theo ten A-Z hoac thu tu upload
+- Download anh ve may
+- Chuyen doi light mode / dark mode
 - Phan quyen: user chi thao tac tren anh cua chinh minh
-- Route guard frontend khi chua dang nhap
-- Du lieu demo de test nhanh
 
 ## Cau truc thu muc
 
@@ -42,11 +39,40 @@ uvicorn app.main:app --reload
 
 Backend mac dinh chay tai `http://127.0.0.1:8000`.
 
-## Cach chay frontend
+## Cai node_modules cho frontend
+
+Co 2 cach:
 
 ```bash
 npm install --prefix frontend
+```
+
+Hoac:
+
+```bash
+cd frontend
+npm install
+```
+
+Neu can cai lai thu cong cac thu vien chinh cho frontend, co the dung:
+
+```bash
+cd frontend
+npm install react react-dom react-router-dom
+npm install -D vite @vitejs/plugin-react
+```
+
+## Cach chay frontend
+
+```bash
 npm run dev --prefix frontend
+```
+
+Hoac:
+
+```bash
+cd frontend
+npm run dev
 ```
 
 Frontend mac dinh chay tai `http://127.0.0.1:5173` va goi API den `http://127.0.0.1:8000`.
@@ -78,17 +104,9 @@ Dong thoi co 2 anh SVG mau de demo gallery, detail va search.
 - `PUT /api/photos/{photo_id}`
 - `DELETE /api/photos/{photo_id}`
 
-## Kiem tra da thuc hien
-
-- Da seed du lieu demo thanh cong.
-- Da smoke test backend cho cac luong: register, login, upload, list, detail, update, delete.
-- Da build frontend thanh cong bang `npm run build --prefix frontend`.
-
 ## Ghi chu
 
 - Thu muc `backend/uploads/` dung de luu file anh upload.
 - File database duoc tao tai `backend/gallery.db` sau khi backend hoac seed script chay.
-<!-- Pus git -->
-git add .
-git commit -m "message" 
-git push origin main
+
+https://github.com/Luv210105/Project_GK.git
