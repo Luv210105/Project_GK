@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: light;
   font-family: "Segoe UI", Tahoma, Arial, sans-serif;
   --bg: #f6efe5;
@@ -61,6 +61,10 @@ body {
   color: var(--ink);
   background: var(--page-bg);
   transition: background 0.25s ease, color 0.25s ease;
+}
+
+img {
+  max-width: 100%;
 }
 
 a {
@@ -132,7 +136,8 @@ select {
 .hero-card h1,
 .form-panel h2,
 .section-heading h1,
-.detail-panel h1 {
+.detail-panel h1,
+.sidebar-panel h2 {
   font-family: "Segoe UI", Tahoma, Arial, sans-serif;
   font-weight: 800;
 }
@@ -159,7 +164,10 @@ select {
 .ghost-button,
 .secondary-button,
 .primary-button,
-.danger-button {
+.danger-button,
+.sidebar-link,
+.mini-button,
+.favorite-chip {
   border: none;
   border-radius: 999px;
   cursor: pointer;
@@ -186,7 +194,7 @@ select {
 }
 
 .page-wrap {
-  width: min(1160px, calc(100% - 2rem));
+  width: min(1240px, calc(100% - 2rem));
   margin: 2rem auto 3rem;
 }
 
@@ -197,7 +205,14 @@ select {
   gap: 1.25rem;
 }
 
-.gallery-layout {
+.gallery-shell {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 1.25rem;
+}
+
+.gallery-main,
+.gallery-section {
   display: grid;
   gap: 1.25rem;
 }
@@ -265,7 +280,8 @@ select {
   background: rgba(255, 255, 255, 0.16);
 }
 
-.form-panel h2 {
+.form-panel h2,
+.sidebar-panel h2 {
   margin-top: 0;
   margin-bottom: 1rem;
   font-size: 2rem;
@@ -273,7 +289,9 @@ select {
 
 .form-panel,
 .upload-form,
-.detail-form {
+.detail-form,
+.album-form,
+.sidebar-panel {
   display: grid;
   gap: 1rem;
 }
@@ -304,7 +322,8 @@ select:focus {
 
 .primary-button,
 .secondary-button,
-.danger-button {
+.danger-button,
+.mini-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -322,7 +341,8 @@ select:focus {
   background: var(--secondary-soft);
 }
 
-.danger-button {
+.danger-button,
+.mini-button.danger {
   color: white;
   background: linear-gradient(135deg, var(--danger), #cf5f56);
 }
@@ -335,7 +355,10 @@ select:focus {
 .secondary-button:hover,
 .danger-button:hover,
 .ghost-button:hover,
-.nav-links a:hover {
+.nav-links a:hover,
+.sidebar-link:hover,
+.mini-button:hover,
+.favorite-chip:hover {
   transform: translateY(-1px);
 }
 
@@ -357,25 +380,16 @@ select:focus {
   margin-bottom: 1rem;
 }
 
-.gallery-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  justify-content: end;
-  gap: 0.75rem;
+.compact-heading {
+  align-items: center;
 }
 
 .search-box {
   width: min(320px, 100%);
 }
 
-.sort-box {
-  min-width: 220px;
-}
-
-.sort-box span {
-  font-size: 0.82rem;
-  color: var(--muted);
+.wide-search {
+  width: min(420px, 100%);
 }
 
 .photo-grid {
@@ -385,6 +399,7 @@ select:focus {
 }
 
 .photo-card {
+  position: relative;
   overflow: hidden;
   border-radius: 24px;
   background: var(--surface-strong);
@@ -414,7 +429,23 @@ select:focus {
   padding: 1rem;
 }
 
-.photo-card-body h3 {
+.photo-header-row,
+.sidebar-heading-row,
+.album-row,
+.album-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.photo-header-row,
+.sidebar-heading-row,
+.album-row {
+  justify-content: space-between;
+}
+
+.photo-card-body h3,
+.sidebar-heading-row h3 {
   margin: 0;
   font-size: 1.15rem;
 }
@@ -454,6 +485,80 @@ select:focus {
   color: var(--muted);
 }
 
+.sidebar-block {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sidebar-link {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  text-align: left;
+  color: var(--ink);
+  background: var(--surface-chip);
+  border: 1px solid var(--line);
+}
+
+.sidebar-link.active {
+  background: var(--secondary-soft);
+  border-color: rgba(31, 108, 120, 0.3);
+}
+
+.album-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.album-row {
+  align-items: start;
+}
+
+.album-row .sidebar-link {
+  flex: 1;
+}
+
+.album-row-actions {
+  flex-shrink: 0;
+}
+
+.mini-button {
+  padding: 0.5rem 0.8rem;
+  color: var(--ink);
+  background: var(--surface-chip);
+  border: 1px solid var(--line);
+}
+
+.favorite-chip {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 2;
+  min-width: 2.7rem;
+  padding: 0.55rem 0.8rem;
+  color: white;
+  background: rgba(16, 22, 29, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+.favorite-chip.active {
+  background: linear-gradient(135deg, var(--accent), #f09d51);
+}
+
+.detail-favorite {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
+
+.album-badge {
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--secondary);
+  background: var(--secondary-soft);
+}
+
 body,
 .topbar,
 .panel,
@@ -463,7 +568,9 @@ textarea,
 select,
 .nav-links a,
 .ghost-button,
-.welcome-text {
+.welcome-text,
+.sidebar-link,
+.favorite-chip {
   transition:
     background 0.25s ease,
     color 0.25s ease,
@@ -471,27 +578,32 @@ select,
     box-shadow 0.25s ease;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 980px) {
+  .gallery-shell,
   .auth-layout,
   .detail-layout {
     grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 860px) {
   .topbar,
-  .section-heading {
+  .section-heading,
+  .photo-header-row,
+  .album-row,
+  .sidebar-heading-row {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .gallery-toolbar {
-    justify-content: stretch;
-  }
-
-  .sort-box {
-    min-width: 100%;
-  }
-
-  .nav-links {
+  .nav-links,
+  .card-actions,
+  .album-row-actions {
     flex-wrap: wrap;
+  }
+
+  .detail-favorite {
+    position: static;
+    margin-bottom: 1rem;
   }
 }

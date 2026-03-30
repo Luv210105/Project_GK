@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+﻿import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth.jsx";
 
 export default function Navbar({ theme, onToggleTheme }) {
@@ -15,8 +15,8 @@ export default function Navbar({ theme, onToggleTheme }) {
       <Link to="/" className="brand">
         <span className="brand-mark">G</span>
         <div>
-          <p>Gallery App</p>
-          <small>Personal photo library</small>
+          <p>Album Gallery</p>
+          <small>Quan ly anh theo album</small>
         </div>
       </Link>
 

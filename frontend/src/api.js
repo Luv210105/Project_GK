@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+﻿const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 export function buildImageUrl(path) {
   if (!path) {
@@ -19,7 +19,7 @@ export function buildDownloadFilename(title, path) {
   let extension = "jpg";
 
   try {
-    const pathname = new URL(imageUrl).pathname;
+    const pathname = new URL(imageUrl, window.location.origin).pathname;
     const fileName = pathname.split("/").pop() || "";
     const extensionParts = fileName.split(".");
 
@@ -63,16 +63,30 @@ export async function apiRequest(path, options = {}, token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new Error("Khong ket noi duoc toi backend. Hay kiem tra backend dang chay.");
+  }
 
   const rawText = await response.text();
-  const data = rawText ? JSON.parse(rawText) : null;
+  let data = null;
+
+  if (rawText) {
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      data = rawText;
+    }
+  }
 
   if (!response.ok) {
-    throw new Error(data?.detail || "Co loi xay ra.");
+    const detail = typeof data === "object" && data ? data.detail : null;
+    throw new Error(detail || "Co loi xay ra.");
   }
 
   return data;

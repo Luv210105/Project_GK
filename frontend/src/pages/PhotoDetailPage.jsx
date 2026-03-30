@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { apiRequest, buildDownloadFilename, buildImageUrl, downloadImage } from "../api";
 import { useAuth } from "../auth.jsx";
@@ -8,20 +8,31 @@ export default function PhotoDetailPage() {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [photo, setPhoto] = useState(null);
-  const [formData, setFormData] = useState({ title: "", description: "" });
+  const [albums, setAlbums] = useState([]);
+  const [formData, setFormData] = useState({ title: "", description: "", album_id: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [togglingFavorite, setTogglingFavorite] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
   const loadPhoto = async () => {
     setLoading(true);
     setError("");
+
     try {
-      const data = await apiRequest(`/api/photos/${photoId}`, { method: "GET" }, token);
-      setPhoto(data);
-      setFormData({ title: data.title, description: data.description || "" });
+      const [photoData, albumData] = await Promise.all([
+        apiRequest(`/api/photos/${photoId}`, { method: "GET" }, token),
+        apiRequest("/api/albums", { method: "GET" }, token),
+      ]);
+      setPhoto(photoData);
+      setAlbums(albumData);
+      setFormData({
+        title: photoData.title,
+        description: photoData.description || "",
+        album_id: photoData.album_id ? String(photoData.album_id) : "",
+      });
     } catch (loadError) {
       setError(loadError.message);
     } finally {
@@ -49,7 +60,10 @@ export default function PhotoDetailPage() {
         `/api/photos/${photoId}`,
         {
           method: "PUT",
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            album_id: formData.album_id ? Number(formData.album_id) : null,
+          }),
         },
         token
       );
@@ -93,6 +107,22 @@ export default function PhotoDetailPage() {
     }
   };
 
+  const handleToggleFavorite = async () => {
+    setTogglingFavorite(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const result = await apiRequest(`/api/photos/${photoId}/favorite`, { method: "PUT" }, token);
+      setPhoto((current) => ({ ...current, is_favorite: result.is_favorite }));
+      setMessage(result.is_favorite ? "Da danh dau yeu thich." : "Da bo danh dau yeu thich.");
+    } catch (toggleError) {
+      setError(toggleError.message);
+    } finally {
+      setTogglingFavorite(false);
+    }
+  };
+
   if (loading) {
     return <div className="panel empty-state">Dang tai chi tiet anh...</div>;
   }
@@ -108,6 +138,14 @@ export default function PhotoDetailPage() {
   return (
     <section className="detail-layout">
       <div className="panel image-panel">
+        <button
+          type="button"
+          className={`favorite-chip detail-favorite ${photo.is_favorite ? "active" : ""}`}
+          onClick={handleToggleFavorite}
+          disabled={togglingFavorite}
+        >
+          {photo.is_favorite ? "♥ Dang yeu thich" : "♡ Danh dau yeu thich"}
+        </button>
         <img src={buildImageUrl(photo.image_url)} alt={photo.title} className="detail-image" />
       </div>
 
@@ -123,12 +161,18 @@ export default function PhotoDetailPage() {
           </label>
           <label>
             Mo ta
-            <textarea
-              name="description"
-              rows="5"
-              value={formData.description}
-              onChange={handleChange}
-            />
+            <textarea name="description" rows="5" value={formData.description} onChange={handleChange} />
+          </label>
+          <label>
+            Album
+            <select name="album_id" value={formData.album_id} onChange={handleChange}>
+              <option value="">Khong thuoc album nao</option>
+              {albums.map((album) => (
+                <option key={album.id} value={album.id}>
+                  {album.name}
+                </option>
+              ))}
+            </select>
           </label>
           {message ? <div className="alert success">{message}</div> : null}
           {error ? <div className="alert error">{error}</div> : null}

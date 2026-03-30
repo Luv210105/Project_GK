@@ -1,81 +1,79 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
-from pathlib import Path
+import json
 import sys
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from app.config import UPLOAD_DIR
+from app.config import DATA_DIR
 from app.database import Base, SessionLocal, engine
-from app.models import Photo, User
+from app.models import Album, Photo, User
 from app.security import hash_password
 
-
-def ensure_svg(filename: str, label: str, color_a: str, color_b: str) -> str:
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    file_path = UPLOAD_DIR / filename
-    if not file_path.exists():
-        file_path.write_text(
-            f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
-<defs>
-  <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-    <stop offset="0%" stop-color="{color_a}" />
-    <stop offset="100%" stop-color="{color_b}" />
-  </linearGradient>
-</defs>
-<rect width="1200" height="800" fill="url(#bg)" rx="36" />
-<circle cx="980" cy="180" r="120" fill="rgba(255,255,255,0.15)" />
-<circle cx="260" cy="620" r="160" fill="rgba(255,255,255,0.12)" />
-<text x="80" y="140" font-size="54" font-family="Segoe UI, Arial, sans-serif" fill="white">{label}</text>
-<text x="80" y="220" font-size="26" font-family="Segoe UI, Arial, sans-serif" fill="white">Sample photo for Gallery App demo</text>
-</svg>""",
-            encoding="utf-8",
-        )
-    return f"/uploads/{filename}"
+SEED_FILE = ROOT_DIR.parent / "seed_data_b.json"
 
 
 def seed() -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+
+    with SEED_FILE.open("r", encoding="utf-8") as file:
+        seed_data = json.load(file)
+
     db = SessionLocal()
     try:
-        user = db.query(User).filter(User.username == "demo").first()
-        if user is None:
-            user = User(
-                username="demo",
-                email="demo@example.com",
-                password=hash_password("demo123"),
-            )
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-
-        existing_titles = {photo.title for photo in db.query(Photo).filter(Photo.user_id == user.id).all()}
-        samples = [
-            ("Sunset Memory", "Ảnh demo đầu tiên cho bài gallery app.", "demo-sunset.svg", "#ff7a18", "#af002d"),
-            ("Ocean Mood", "Ảnh demo thứ hai để kiểm tra danh sách và chi tiết.", "demo-ocean.svg", "#0f2027", "#2c5364"),
-        ]
-
-        for title, description, filename, color_a, color_b in samples:
-            if title in existing_titles:
-                continue
-            image_url = ensure_svg(filename, title, color_a, color_b)
-            db.add(
-                Photo(
-                    title=title,
-                    description=description,
-                    image_url=image_url,
-                    user_id=user.id,
+        users = []
+        for item in seed_data.get("users", []):
+            users.append(
+                User(
+                    id=item["id"],
+                    username=item["username"],
+                    email=item["email"],
+                    password=hash_password(item["password"]),
                 )
             )
+        db.add_all(users)
+        db.flush()
 
+        albums = []
+        for item in seed_data.get("albums", []):
+            albums.append(
+                Album(
+                    id=item["id"],
+                    name=item["name"],
+                    description=item.get("description", ""),
+                    user_id=item["user_id"],
+                )
+            )
+        db.add_all(albums)
+        db.flush()
+
+        photos = []
+        for item in seed_data.get("photos", []):
+            photos.append(
+                Photo(
+                    id=item["id"],
+                    title=item["title"],
+                    description=item.get("description", ""),
+                    image_url=item["image_url"],
+                    album_id=item.get("album_id"),
+                    is_favorite=bool(item.get("is_favorite", False)),
+                    user_id=item["user_id"],
+                )
+            )
+        db.add_all(photos)
         db.commit()
-        print("Seeded demo user: demo / demo123")
+
+        print("Seeded users: alice / 123456, bob / 123456")
+        print(f"Albums: {len(albums)}")
+        print(f"Photos: {len(photos)}")
     finally:
         db.close()
 
 
 if __name__ == "__main__":
     seed()
-

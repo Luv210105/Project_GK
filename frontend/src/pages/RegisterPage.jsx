@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiRequest } from "../api";
 
@@ -25,7 +25,7 @@ export default function RegisterPage() {
         method: "POST",
         body: JSON.stringify(formData),
       });
-      setSuccess("Đăng ký thành công. Bạn có thể đăng nhập ngay bây giờ.");
+      setSuccess("Dang ky thanh cong. Ban co the dang nhap ngay bay gio.");
       setTimeout(() => navigate("/login"), 900);
     } catch (submissionError) {
       setError(submissionError.message);
@@ -38,9 +38,9 @@ export default function RegisterPage() {
     <section className="auth-layout">
       <div className="hero-card accent-card">
         <p className="eyebrow">Create Account</p>
-        <h1>Tạo tài khoản để bắt đầu lưu trữ ảnh của riêng bạn.</h1>
+        <h1>Tao tai khoan de bat dau quan ly album cua rieng ban.</h1>
         <p className="muted-text">
-          Mỗi người dùng chỉ nhìn thấy ảnh của chính mình. Password được hash ở backend trước khi lưu.
+          Moi nguoi dung chi thay du lieu cua minh. Password duoc hash o backend truoc khi luu vao database.
         </p>
       </div>
 
@@ -51,7 +51,7 @@ export default function RegisterPage() {
           <input
             name="username"
             type="text"
-            placeholder="Ít nhất 3 ký tự"
+            placeholder="It nhat 3 ky tu"
             value={formData.username}
             onChange={handleChange}
             required
@@ -73,7 +73,7 @@ export default function RegisterPage() {
           <input
             name="password"
             type="password"
-            placeholder="Ít nhất 6 ký tự"
+            placeholder="It nhat 6 ky tu"
             value={formData.password}
             onChange={handleChange}
             required
@@ -82,10 +82,10 @@ export default function RegisterPage() {
         {error ? <div className="alert error">{error}</div> : null}
         {success ? <div className="alert success">{success}</div> : null}
         <button type="submit" className="primary-button" disabled={loading}>
-          {loading ? "Đang tạo..." : "Đăng ký"}
+          {loading ? "Dang tao..." : "Dang ky"}
         </button>
         <p className="switch-link">
-          Đã có tài khoản? <Link to="/login">Quay lại đăng nhập</Link>
+          Da co tai khoan? <Link to="/login">Quay lai dang nhap</Link>
         </p>
       </form>
     </section>

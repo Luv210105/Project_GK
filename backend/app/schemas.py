@@ -1,6 +1,7 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
@@ -27,7 +28,7 @@ class UserCreate(BaseModel):
     def validate_username(cls, value: str) -> str:
         value = value.strip()
         if len(value) < 3:
-            raise ValueError("Username phải có ít nhất 3 ký tự.")
+            raise ValueError("Username phai co it nhat 3 ky tu.")
         return value
 
     @field_validator("email")
@@ -35,14 +36,14 @@ class UserCreate(BaseModel):
     def validate_email(cls, value: str) -> str:
         value = value.strip().lower()
         if "@" not in value or "." not in value.split("@")[-1]:
-            raise ValueError("Email không hợp lệ.")
+            raise ValueError("Email khong hop le.")
         return value
 
     @field_validator("password")
     @classmethod
     def validate_password(cls, value: str) -> str:
         if len(value) < 6:
-            raise ValueError("Password phải có ít nhất 6 ký tự.")
+            raise ValueError("Password phai co it nhat 6 ky tu.")
         return value
 
 
@@ -55,7 +56,7 @@ class UserLogin(BaseModel):
     def validate_login(cls, value: str) -> str:
         value = value.strip()
         if not value:
-            raise ValueError("Vui lòng nhập username hoặc email.")
+            raise ValueError("Vui long nhap username hoac email.")
         return value
 
 
@@ -65,6 +66,42 @@ class TokenResponse(BaseModel):
     user: UserRead
 
 
+class AlbumRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    description: str
+    created_at: datetime
+    user_id: int
+
+
+class AlbumCreate(BaseModel):
+    name: str
+    description: str = ""
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("Ten album khong duoc de trong.")
+        return value
+
+
+class AlbumUpdate(BaseModel):
+    name: str
+    description: str = ""
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("Ten album khong duoc de trong.")
+        return value
+
+
 class PhotoRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -72,6 +109,8 @@ class PhotoRead(BaseModel):
     title: str
     description: str
     image_url: str
+    album_id: Optional[int]
+    is_favorite: bool
     uploaded_at: datetime
     user_id: int
 
@@ -79,12 +118,20 @@ class PhotoRead(BaseModel):
 class PhotoUpdate(BaseModel):
     title: str
     description: str = ""
+    album_id: Optional[int] = None
 
     @field_validator("title")
     @classmethod
     def validate_title(cls, value: str) -> str:
         value = value.strip()
         if not value:
-            raise ValueError("Tiêu đề ảnh không được để trống.")
+            raise ValueError("Tieu de anh khong duoc de trong.")
         return value
 
+
+class PhotoAlbumUpdate(BaseModel):
+    album_id: Optional[int] = None
+
+
+class FavoriteToggleResponse(BaseModel):
+    is_favorite: bool

@@ -1,0 +1,92 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "alice",
+      "email": "alice@example.com",
+      "password": "123456"
+    },
+    {
+      "id": 2,
+      "username": "bob",
+      "email": "bob@example.com",
+      "password": "123456"
+    }
+  ],
+  "albums": [
+    {
+      "id": 1,
+      "name": "Du lịch",
+      "description": "Ảnh chụp trong các chuyến du lịch",
+      "user_id": 1
+    },
+    {
+      "id": 2,
+      "name": "Ẩm thực",
+      "description": "Các món ăn yêu thích",
+      "user_id": 1
+    },
+    {
+      "id": 3,
+      "name": "Phong cảnh",
+      "description": "Ảnh phong cảnh thiên nhiên",
+      "user_id": 2
+    }
+  ],
+  "photos": [
+    {
+      "id": 1,
+      "title": "Biển Đà Nẵng",
+      "description": "Hoàng hôn tại bãi biển Mỹ Khê",
+      "image_url": "https://picsum.photos/id/100/800/600",
+      "album_id": 1,
+      "is_favorite": true,
+      "user_id": 1
+    },
+    {
+      "id": 2,
+      "title": "Phở Hà Nội",
+      "description": "Phở bò truyền thống",
+      "image_url": "https://picsum.photos/id/200/800/600",
+      "album_id": 2,
+      "is_favorite": false,
+      "user_id": 1
+    },
+    {
+      "id": 3,
+      "title": "Hội An đêm",
+      "description": "Phố cổ Hội An về đêm với đèn lồng",
+      "image_url": "https://picsum.photos/id/300/800/600",
+      "album_id": 1,
+      "is_favorite": true,
+      "user_id": 1
+    },
+    {
+      "id": 4,
+      "title": "Núi Fansipan",
+      "description": "Đỉnh Fansipan trong sương mù",
+      "image_url": "https://picsum.photos/id/400/800/600",
+      "album_id": 3,
+      "is_favorite": false,
+      "user_id": 2
+    },
+    {
+      "id": 5,
+      "title": "Bánh mì Sài Gòn",
+      "description": "Bánh mì thịt nướng đặc biệt",
+      "image_url": "https://picsum.photos/id/500/800/600",
+      "album_id": 2,
+      "is_favorite": true,
+      "user_id": 1
+    },
+    {
+      "id": 6,
+      "title": "Ruộng bậc thang",
+      "description": "Ruộng bậc thang Mù Cang Chải mùa lúa chín",
+      "image_url": "https://picsum.photos/id/600/800/600",
+      "album_id": null,
+      "is_favorite": false,
+      "user_id": 2
+    }
+  ]
+}

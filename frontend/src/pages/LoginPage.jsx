@@ -38,22 +38,22 @@ export default function LoginPage() {
   return (
     <section className="auth-layout">
       <div className="hero-card">
-        <p className="eyebrow">Gallery Demo</p>
-        <h1>Đăng nhập để quản lý bộ sưu tập ảnh cá nhân.</h1>
+        <p className="eyebrow">De B</p>
+        <h1>Dang nhap de quan ly album va danh dau anh yeu thich.</h1>
         <p className="muted-text login-description">
-          Ứng dụng hỗ trợ upload ảnh, xem danh sách, xem chi tiết, chỉnh sửa, xóa và tìm kiếm theo tên.
+          Ung dung ho tro album, bo loc theo album, danh sach yeu thich, upload anh va sua thong tin anh.
         </p>
-        <div className="info-pill">Tài khoản demo sau khi seed: demo / demo123</div>
+        <div className="info-pill">Tai khoan seed: alice / 123456 hoac bob / 123456</div>
       </div>
 
       <form className="panel form-panel" onSubmit={handleSubmit}>
         <h2>Login</h2>
         <label>
-          Username hoặc Email
+          Username hoac Email
           <input
             name="login"
             type="text"
-            placeholder="demo hoặc demo@example.com"
+            placeholder="alice hoac alice@example.com"
             value={formData.login}
             onChange={handleChange}
             required
@@ -64,7 +64,7 @@ export default function LoginPage() {
           <input
             name="password"
             type="password"
-            placeholder="Nhập mật khẩu"
+            placeholder="Nhap mat khau"
             value={formData.password}
             onChange={handleChange}
             required
@@ -72,13 +72,12 @@ export default function LoginPage() {
         </label>
         {error ? <div className="alert error">{error}</div> : null}
         <button type="submit" className="primary-button" disabled={loading}>
-          {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+          {loading ? "Dang dang nhap..." : "Dang nhap"}
         </button>
         <p className="switch-link">
-          Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
+          Chua co tai khoan? <Link to="/register">Dang ky ngay</Link>
         </p>
       </form>
     </section>
   );
 }
-
