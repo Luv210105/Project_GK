@@ -1,7 +1,5 @@
 ﻿# Gallery App
 
-Gallery App duoc build theo dung de bai trong file `chuan-bi-gk_20260323.docx` va checklist `gallery_app_checklist.pdf`.
-
 ## Cong nghe
 
 - Backend: FastAPI
