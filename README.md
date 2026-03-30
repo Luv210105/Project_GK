@@ -90,3 +90,7 @@ Dong thoi co 2 anh SVG mau de demo gallery, detail va search.
 
 - Thu muc `backend/uploads/` dung de luu file anh upload.
 - File database duoc tao tai `backend/gallery.db` sau khi backend hoac seed script chay.
+<!-- Pus git -->
+git add .
+git commit -m "message" 
+git push origin main
